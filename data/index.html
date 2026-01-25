@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Minha Casa Inteligente</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+    <h1><i class="fas fa-home"></i> Controlo Central</h1>
+    
+    <div class="menu-grid">
+        
+        <a href="tv.html" class="card menu-card">
+            <i class="fas fa-tv icon-big"></i>
+            <h3>Televisão</h3>
+        
+        </a>
+
+        <a href="meo.html" class="card menu-card">
+            <i class="fas fa-box icon-big" style="color: #d63384;"></i>
+            <h3>Box MEO</h3>
+        </a>
+        <a href="pirata.html" class="card menu-card">
+            <i class="fas fa-box icon-big" style="color: red"></i>
+            <h3>Box Pirata</h3>
+        </a>
+
+      <a href="stats.html" class="card menu-card">
+            <i class="fas fa-chart-pie icon-big" style="color: var(--success)"></i>
+            <h3>Estatísticas</h3>
+        </a>
+
+        
+
+    </div>
+</div>
+
+<script>
+    function atualizarStats() {
+        // Simulação rápida só para o menu não ficar vazio
+        document.getElementById('uptime').innerText = "ONLINE";
+        document.getElementById('wifi').innerText = "-55 dBm";
+    }
+    atualizarStats();
+</script>
+
+</body>
+</html>

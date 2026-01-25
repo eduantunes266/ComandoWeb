@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Estatísticas do Sistema</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<div class="container">
+    <div style="text-align: left; margin-bottom: 20px;">
+        <a href="index.html" class="btn" style="width: auto; display: inline-flex; padding: 10px 20px;">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+    </div>
+
+    <h1><i class="fas fa-chart-line"></i> Métricas</h1>
+
+    <div class="card">
+        <h2><i class="fas fa-server"></i> Sistema</h2>
+        <div class="stats-grid">
+            <div class="stat-item">
+                <span id="uptime">--</span>
+                <i class="fas fa-clock" style="font-size:0.8em"></i> Uptime
+            </div>
+            <div class="stat-item">
+                <span id="wifi">--</span>
+                <i class="fas fa-wifi" style="font-size:0.8em"></i> Wi-Fi (dBm)
+            </div>
+            <div class="stat-item">
+                <span id="memory">--</span>
+                <i class="fas fa-microchip" style="font-size:0.8em"></i> Memória Livre
+            </div>
+            <div class="stat-item">
+                <span id="ip">--</span>
+                <i class="fas fa-network-wired" style="font-size:0.8em"></i> IP Local
+            </div>
+        </div>
+    </div>
+
+    <div class="card">
+        <h2><i class="fas fa-history"></i> Utilização</h2>
+        <div class="stats-grid">
+            <div class="stat-item">
+                <span id="cmds" style="color: var(--success)">0</span>
+                Total Comandos
+            </div>
+            <div class="stat-item">
+                <span id="last" style="color: #ffc107">--</span>
+                Última Ação
+            </div>
+        </div>
+        <br>
+        <button class="btn btn-blue" style="width:100%" onclick="atualizarStats()">
+            <i class="fas fa-sync-alt"></i> Atualizar Agora
+        </button>
+    </div>
+</div>
+
+<script>
+    function atualizarStats() {
+        console.log("A pedir dados...");
+        
+        // --- SIMULAÇÃO (Para testares no PC) ---
+        const dados = {
+            uptime_segundos: "2d 4h",
+            sinal_wifi: -45,
+            memoria_livre: "140 KB",
+            ip_local: "192.168.1.50",
+            total_comandos: 128,
+            ultima_acao: "Vol + (TV)"
+        };
+        
+        document.getElementById('uptime').innerText = dados.uptime_segundos;
+        document.getElementById('wifi').innerText = dados.sinal_wifi;
+        document.getElementById('memory').innerText = dados.memoria_livre;
+        document.getElementById('ip').innerText = dados.ip_local;
+        document.getElementById('cmds').innerText = dados.total_comandos;
+        document.getElementById('last').innerText = dados.ultima_acao;
+    }
+
+    // Atualiza mal abres a página
+    atualizarStats();
+</script>
+
+</body>
+</html>

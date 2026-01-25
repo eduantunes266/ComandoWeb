@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comando TV Xiaomi V4</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* --- CONFIGURAÇÃO GERAL --- */
+        body {
+            background-color: #121212;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* --- CORPO DO COMANDO --- */
+        .remote-body {
+            background-color: #181818;
+            width: 210px;
+            height: auto;
+            border-radius: 20px;
+            box-shadow: 15px 15px 40px #0a0a0a, -5px -5px 20px #2a2a2a;
+            padding: 30px 20px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            position: relative;
+            border: 1px solid #222;
+        }
+
+        /* Texto da Marca */
+        .brand-logo {
+            text-align: center; color: #333; font-weight: bold;
+            font-size: 0.9em; margin-top: 10px; letter-spacing: 1px;
+        }
+
+        /* --- ESTILO DOS BOTÕES --- */
+        button {
+            border: none; outline: none; cursor: pointer;
+            color: #ccc; background: #222;
+            transition: all 0.1s;
+            display: flex; justify-content: center; align-items: center;
+            user-select: none;
+            box-shadow: 2px 2px 5px #0f0f0f, -1px -1px 3px #2a2a2a;
+        }
+        button:active {
+            box-shadow: inset 2px 2px 5px #0f0f0f, inset -1px -1px 3px #2a2a2a;
+            color: white; transform: translateY(1px);
+        }
+
+        /* 1. TOPO: Power e Mic */
+        .row-top { display: flex; justify-content: space-between; padding: 0 10px; }
+        .btn-small { width: 40px; height: 40px; border-radius: 50%; font-size: 1em; }
+        .power { color: #d63031; }
+        .mic { color: #0984e3; }
+
+        /* 2. NUMPAD */
+        .num-pad {
+            display: grid; grid-template-columns: repeat(3, 1fr); 
+            gap: 12px; padding: 0 5px; justify-items: center;
+        }
+        .btn-num {
+            width: 45px; height: 45px; border-radius: 50%; font-size: 1.1em;
+            background: #1f1f1f;
+        }
+
+        /* 3. FILA EXTRA: Source, EPG, Audio */
+        .row-extra {
+            display: flex; justify-content: space-around; padding: 5px 0;
+        }
+        .btn-extra {
+            width: 45px; height: 45px; border-radius: 50%; 
+            font-size: 0.7em; font-weight: bold; letter-spacing: 0.5px;
+        }
+        .icon-source { font-size: 1.2em; } 
+
+        /* 4. APPS */
+        .app-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 10px;
+        }
+        .btn-app {
+            height: 35px; border-radius: 5px; font-size: 0.7em; font-weight: bold;
+            background: #e0e0e0; color: #222;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+        }
+        .btn-app:active { background: #ccc; }
+        .netflix { color: #e50914; } .prime { color: #00a8e1; }
+        .yt { color: #ff0000; } .live { color: #333; }
+
+        /* 5. D-PAD */
+        .nav-area {
+            position: relative; width: 100%; height: 160px;
+            display: flex; justify-content: center; align-items: center;
+        }
+        .d-pad {
+            width: 150px; height: 150px; border-radius: 50%;
+            background: #181818; position: relative;
+            border: 2px solid #2a2a2a;
+            box-shadow: 5px 5px 15px #0a0a0a, -2px -2px 10px #2a2a2a;
+        }
+        .d-btn {
+            position: absolute; background: transparent; box-shadow: none;
+            color: #777; font-size: 1.2em;
+        }
+        .d-btn:active { background: transparent; color: white; box-shadow: none; }
+        .up { top: 10px; left: 50%; transform: translateX(-50%); width: 50px; height: 40px; }
+        .down { bottom: 10px; left: 50%; transform: translateX(-50%); width: 50px; height: 40px; }
+        .left { left: 10px; top: 50%; transform: translateY(-50%); width: 40px; height: 50px; }
+        .right { right: 10px; top: 50%; transform: translateY(-50%); width: 40px; height: 50px; }
+        
+        .btn-ok {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 60px; height: 60px; border-radius: 50%;
+            background: #111; border: 1px solid #333; z-index: 10; font-size: 0.8em;
+        }
+
+        /* 6. NAVEGAÇÃO ANDROID (AQUI ESTÁ A CORREÇÃO) */
+        .nav-row {
+            display: flex; justify-content: space-around; align-items: center;
+        }
+        .btn-nav { width: 45px; height: 45px; border-radius: 50%; font-size: 1.1em; }
+        
+        /* Botão Home (Casa) */
+        .btn-home { font-size: 1.2em; }
+
+        /* 7. VOL/CH */
+        .vol-ch-container {
+            display: grid; grid-template-columns: 1fr 1fr 1fr; 
+            gap: 10px; align-items: center; justify-items: center;
+        }
+        .vertical-pill {
+            width: 45px; height: 100px; background: #1f1f1f;
+            border-radius: 20px;
+            display: flex; flex-direction: column; justify-content: space-between;
+            overflow: hidden; box-shadow: 3px 3px 6px #0a0a0a, -1px -1px 3px #2a2a2a;
+        }
+        .vertical-pill button {
+            width: 100%; height: 50%; background: transparent; box-shadow: none;
+            border-radius: 0; font-size: 1em;
+        }
+        .vertical-pill button:active { background: rgba(255,255,255,0.1); }
+        .btn-mute { width: 40px; height: 40px; border-radius: 50%; font-size: 0.8em; }
+
+        /* 8. CORES */
+        .color-row { display: flex; justify-content: space-around; padding: 0 5px; }
+        .btn-color {
+            width: 30px; height: 30px; border-radius: 50%; box-shadow: none;
+            border: 1px solid rgba(0,0,0,0.5);
+        }
+        .c-red { background: #d63031; } .c-green { background: #00b894; }
+        .c-yellow { background: #fdcb6e; } .c-blue { background: #0984e3; }
+
+        .back-link {
+            position: absolute; top: 20px; left: 20px;
+            color: #555; text-decoration: none; font-size: 1.5em;
+        }
+    </style>
+</head>
+<body>
+
+    <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i></a>
+
+    <div class="remote-body">
+        
+        <div class="row-top">
+            <button class="btn-small power" onclick="send('TV_POWER')"><i class="fas fa-power-off"></i></button>
+            <button class="btn-small mic" onclick="send('TV_MIC')"><i class="fas fa-microphone"></i></button>
+        </div>
+
+        <div class="num-pad">
+            <button class="btn-num" onclick="send('TV_1')">1</button>
+            <button class="btn-num" onclick="send('TV_2')">2</button>
+            <button class="btn-num" onclick="send('TV_3')">3</button>
+            <button class="btn-num" onclick="send('TV_4')">4</button>
+            <button class="btn-num" onclick="send('TV_5')">5</button>
+            <button class="btn-num" onclick="send('TV_6')">6</button>
+            <button class="btn-num" onclick="send('TV_7')">7</button>
+            <button class="btn-num" onclick="send('TV_8')">8</button>
+            <button class="btn-num" onclick="send('TV_9')">9</button>
+            <button class="btn-num" onclick="send('TV_INFO')" style="font-size: 0.6em;">INFO</button>
+            <button class="btn-num" onclick="send('TV_0')">0</button>
+            <button class="btn-num" onclick="send('TV_TTX')" style="font-size: 0.6em;">TTX</button>
+        </div>
+
+        <div class="row-extra">
+            <button class="btn-extra" onclick="send('TV_SOURCE')"><i class="fas fa-arrow-right-to-bracket icon-source"></i></button>
+            <button class="btn-extra" onclick="send('TV_EPG')">EPG</button>
+            <button class="btn-extra" onclick="send('TV_AUDIO')">AUDIO</button>
+        </div>
+
+        <div class="app-grid">
+            <button class="btn-app netflix" onclick="send('TV_NETFLIX')">NETFLIX</button>
+            <button class="btn-app prime" onclick="send('TV_PRIME')">prime video</button>
+            <button class="btn-app yt" onclick="send('TV_YOUTUBE')">YouTube</button>
+            <button class="btn-app live" onclick="send('TV_LIVE')">Live TV</button>
+        </div>
+
+        <div class="nav-area">
+            <div class="d-pad">
+                <button class="d-btn up" onclick="send('TV_UP')"><i class="fas fa-chevron-up"></i></button>
+                <button class="d-btn left" onclick="send('TV_LEFT')"><i class="fas fa-chevron-left"></i></button>
+                <button class="d-btn right" onclick="send('TV_RIGHT')"><i class="fas fa-chevron-right"></i></button>
+                <button class="d-btn down" onclick="send('TV_DOWN')"><i class="fas fa-chevron-down"></i></button>
+                <button class="btn-ok" onclick="send('TV_OK')">OK</button>
+            </div>
+        </div>
+
+        <div class="nav-row">
+            <button class="btn-nav" onclick="send('TV_SETTINGS')"><i class="fas fa-cog"></i></button>
+            
+            <button class="btn-nav" onclick="send('TV_BACK')"><i class="fas fa-arrow-left"></i></button>
+            
+            <button class="btn-nav btn-home" onclick="send('TV_HOME')"><i class="fas fa-home"></i></button>
+        </div>
+
+        <div class="vol-ch-container">
+            <div class="vertical-pill">
+                <button onclick="send('TV_VOL_UP')"><i class="fas fa-plus"></i></button>
+                <button onclick="send('TV_VOL_DOWN')"><i class="fas fa-minus"></i></button>
+            </div>
+            <div style="display:flex; flex-direction:column; gap:10px">
+                <button class="btn-mute" onclick="send('TV_EXIT')" style="font-size:0.6em">EXIT</button>
+                <button class="btn-mute" onclick="send('TV_MUTE')"><i class="fas fa-volume-mute"></i></button>
+            </div>
+            <div class="vertical-pill">
+                <button onclick="send('TV_CH_UP')"><i class="fas fa-angle-up"></i></button>
+                <button onclick="send('TV_CH_DOWN')"><i class="fas fa-angle-down"></i></button>
+            </div>
+        </div>
+
+        <div class="color-row">
+            <button class="btn-color c-red" onclick="send('TV_RED')"></button>
+            <button class="btn-color c-green" onclick="send('TV_GREEN')"></button>
+            <button class="btn-color c-yellow" onclick="send('TV_YELLOW')"></button>
+            <button class="btn-color c-blue" onclick="send('TV_BLUE')"></button>
+        </div>
+
+        <div class="brand-logo">xiaomi</div>
+    </div>
+
+    <script>
+        function send(comando) {
+            console.log("Enviado: " + comando);
+            if (navigator.vibrate) navigator.vibrate(30);
+            // fetch('/api/ir?cmd=' + comando); 
+        }
+    </script>
+</body>
+</html>

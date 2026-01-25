@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Comando Android Box V3</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* --- CONFIGURAÇÃO GERAL --- */
+        body {
+            background-color: #121212;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: 'Segoe UI', sans-serif;
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        /* --- CORPO DO COMANDO --- */
+        .remote-body {
+            background-color: #1a1a1a;
+            width: 150px;
+            height: auto;
+            border-radius: 25px;
+            box-shadow: 15px 15px 40px #0a0a0a, -5px -5px 20px #2a2a2a;
+            padding: 40px 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+            position: relative;
+            border: 1px solid #222;
+        }
+
+        /* Texto da Marca */
+        .brand-logo {
+            color: #444; font-weight: bold;
+            font-size: 0.9em; margin-top: 20px; letter-spacing: 1px;
+        }
+
+        /* --- ESTILO DOS BOTÕES GERAIS --- */
+        button {
+            border: none; outline: none; cursor: pointer;
+            color: #ccc; background: #222;
+            transition: all 0.1s;
+            display: flex; justify-content: center; align-items: center;
+            user-select: none;
+            box-shadow: 3px 3px 6px #0f0f0f, -1px -1px 3px #2a2a2a;
+        }
+
+        /* CORREÇÃO DO GHOSTING: 
+           Removemos o 'transform' e usamos apenas sombra interior.
+           Assim o botão não salta do sítio. */
+        button:active {
+            box-shadow: inset 2px 2px 5px #0f0f0f, inset -1px -1px 3px #2a2a2a;
+            color: white;
+            background: #202020;
+        }
+
+        /* 1. TOPO: Power e Assistant */
+        .btn-circle {
+            width: 40px; height: 40px; border-radius: 50%; font-size: 1em;
+        }
+        .power { color: #e74c3c; margin-bottom: 5px;}
+        .assistant { 
+            font-size: 1.2em;
+            background: radial-gradient(circle at 30% 30%, #333, #222);
+        }
+        .assistant i {
+            background: -webkit-linear-gradient(45deg, #4285F4, #DB4437, #F4B400, #0F9D58);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        /* 2. D-PAD (Roda) */
+        .nav-area {
+            position: relative; width: 140px; height: 140px;
+            display: flex; justify-content: center; align-items: center;
+            margin: 10px 0;
+        }
+        .d-pad {
+            width: 130px; height: 130px; border-radius: 50%;
+            background: #1a1a1a; position: relative;
+            box-shadow:  5px 5px 10px #0e0e0e, -5px -5px 10px #262626;
+        }
+        .d-btn {
+            position: absolute; background: transparent; box-shadow: none;
+            color: #666; font-size: 1.2em;
+        }
+        /* Correção específica para a roda não ter fundo ao clicar */
+        .d-btn:active { background: transparent; color: white; box-shadow: none; }
+
+        .up { top: 10px; left: 50%; transform: translateX(-50%); width: 40px; height: 40px; }
+        .down { bottom: 10px; left: 50%; transform: translateX(-50%); width: 40px; height: 40px; }
+        .left { left: 10px; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; }
+        .right { right: 10px; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; }
+        
+        .btn-ok {
+            position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);
+            width: 50px; height: 50px; border-radius: 50%;
+            background: #1a1a1a; 
+            box-shadow: inset 2px 2px 5px #0a0a0a, inset -1px -1px 3px #2a2a2a;
+            z-index: 10; font-size: 0.8em;
+        }
+        /* O OK precisa de afundar um pouco mais visualmente */
+        .btn-ok:active { background: #151515; }
+
+        /* 3. NAV ROW (TV+ | Back | Home) */
+        .nav-row {
+            display: flex; justify-content: space-between; width: 100%; padding: 0 5px; box-sizing: border-box;
+        }
+        .btn-nav { width: 40px; height: 40px; border-radius: 50%; font-size: 1em; }
+        .btn-tiny-text { font-size: 0.5em; font-weight: bold; line-height: 1; text-align: center; }
+        
+        /* Botão Home corrigido para CASINHA */
+        .btn-home { font-size: 1.1em; } 
+
+        /* 4. APPS */
+        .app-grid {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%;
+        }
+        .btn-app {
+            height: 35px; border-radius: 8px; font-size: 0.6em; font-weight: 800;
+            background: #e0e0e0; color: #222;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.5);
+            display: flex; justify-content: center; align-items: center; gap: 5px;
+        }
+        .btn-app:active { background: #ccc; }
+        .netflix { color: #e50914; } .prime { color: #00a8e1; }
+        .yt { color: #ff0000; } .apps { color: #555; font-size: 1.2em; }
+
+        /* 5. VOLUME */
+        .vol-rocker {
+            width: 45px; height: 90px;
+            background: #222; border-radius: 20px;
+            display: flex; flex-direction: column; justify-content: space-between;
+            overflow: hidden;
+            box-shadow: 3px 3px 6px #0a0a0a, -1px -1px 3px #2a2a2a;
+            margin-top: 10px;
+        }
+        .vol-rocker button {
+            width: 100%; height: 50%; background: transparent; box-shadow: none;
+            border-radius: 0; font-size: 1em;
+        }
+        .vol-rocker button:active { background: rgba(255,255,255,0.05); }
+        .vol-divider { width: 80%; height: 1px; background: #1a1a1a; align-self: center; opacity: 0.5; }
+
+        .back-link {
+            position: absolute; top: 20px; left: 20px;
+            color: #555; text-decoration: none; font-size: 1.5em;
+        }
+
+    </style>
+</head>
+<body>
+
+    <a href="index.html" class="back-link"><i class="fas fa-arrow-left"></i></a>
+
+    <div class="remote-body">
+        
+        <button class="btn-circle power" onclick="send('BOX_POWER')"><i class="fas fa-power-off"></i></button>
+        <button class="btn-circle assistant" onclick="send('BOX_MIC')"><i class="fas fa-microphone"></i></button>
+
+        <div class="nav-area">
+            <div class="d-pad">
+                <button class="d-btn up" onclick="send('BOX_UP')"><i class="fas fa-chevron-up"></i></button>
+                <button class="d-btn left" onclick="send('BOX_LEFT')"><i class="fas fa-chevron-left"></i></button>
+                <button class="d-btn right" onclick="send('BOX_RIGHT')"><i class="fas fa-chevron-right"></i></button>
+                <button class="d-btn down" onclick="send('BOX_DOWN')"><i class="fas fa-chevron-down"></i></button>
+                <button class="btn-ok" onclick="send('BOX_OK')"></button>
+            </div>
+        </div>
+
+        <div class="nav-row">
+            <button class="btn-nav btn-tiny-text" onclick="send('BOX_TVPLUS')">Xiaomi<br>TV+</button>
+            <button class="btn-nav" onclick="send('BOX_BACK')"><i class="fas fa-arrow-left"></i></button>
+            <button class="btn-nav btn-home" onclick="send('BOX_HOME')"><i class="fas fa-home"></i></button>
+        </div>
+
+        <div class="app-grid">
+            <button class="btn-app netflix" onclick="send('BOX_NETFLIX')">NETFLIX</button>
+            <button class="btn-app prime" onclick="send('BOX_PRIME')">prime video</button>
+            <button class="btn-app yt" onclick="send('BOX_YOUTUBE')">YouTube</button>
+            <button class="btn-app" onclick="send('BOX_APPS')"><i class="fas fa-th apps"></i></button>
+        </div>
+
+        <div class="vol-rocker">
+            <button onclick="send('BOX_VOL_UP')"><i class="fas fa-plus"></i></button>
+            <div class="vol-divider"></div>
+            <button onclick="send('BOX_VOL_DOWN')"><i class="fas fa-minus"></i></button>
+        </div>
+
+        <div class="brand-logo">xiaomi</div>
+
+    </div>
+
+    <script>
+        function send(comando) {
+            console.log("Comando Android: " + comando);
+            if (navigator.vibrate) navigator.vibrate(30);
+            // fetch('/api/ir?cmd=' + comando); 
+        }
+    </script>
+
+</body>
+</html>
