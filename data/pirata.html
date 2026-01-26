@@ -6,7 +6,6 @@
     <title>Comando Android Box V3</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
-        /* --- CONFIGURAÇÃO GERAL --- */
         body {
             background-color: #121212;
             display: flex;
@@ -18,7 +17,6 @@
             -webkit-tap-highlight-color: transparent;
         }
 
-        /* --- CORPO DO COMANDO --- */
         .remote-body {
             background-color: #1a1a1a;
             width: 150px;
@@ -34,13 +32,11 @@
             border: 1px solid #222;
         }
 
-        /* Texto da Marca */
         .brand-logo {
             color: #444; font-weight: bold;
             font-size: 0.9em; margin-top: 20px; letter-spacing: 1px;
         }
 
-        /* --- ESTILO DOS BOTÕES GERAIS --- */
         button {
             border: none; outline: none; cursor: pointer;
             color: #ccc; background: #222;
@@ -50,16 +46,13 @@
             box-shadow: 3px 3px 6px #0f0f0f, -1px -1px 3px #2a2a2a;
         }
 
-        /* CORREÇÃO DO GHOSTING: 
-           Removemos o 'transform' e usamos apenas sombra interior.
-           Assim o botão não salta do sítio. */
+        
         button:active {
             box-shadow: inset 2px 2px 5px #0f0f0f, inset -1px -1px 3px #2a2a2a;
             color: white;
             background: #202020;
         }
 
-        /* 1. TOPO: Power e Assistant */
         .btn-circle {
             width: 40px; height: 40px; border-radius: 50%; font-size: 1em;
         }
@@ -74,7 +67,6 @@
             -webkit-text-fill-color: transparent;
         }
 
-        /* 2. D-PAD (Roda) */
         .nav-area {
             position: relative; width: 140px; height: 140px;
             display: flex; justify-content: center; align-items: center;
@@ -89,7 +81,6 @@
             position: absolute; background: transparent; box-shadow: none;
             color: #666; font-size: 1.2em;
         }
-        /* Correção específica para a roda não ter fundo ao clicar */
         .d-btn:active { background: transparent; color: white; box-shadow: none; }
 
         .up { top: 10px; left: 50%; transform: translateX(-50%); width: 40px; height: 40px; }
@@ -104,20 +95,16 @@
             box-shadow: inset 2px 2px 5px #0a0a0a, inset -1px -1px 3px #2a2a2a;
             z-index: 10; font-size: 0.8em;
         }
-        /* O OK precisa de afundar um pouco mais visualmente */
         .btn-ok:active { background: #151515; }
 
-        /* 3. NAV ROW (TV+ | Back | Home) */
         .nav-row {
             display: flex; justify-content: space-between; width: 100%; padding: 0 5px; box-sizing: border-box;
         }
         .btn-nav { width: 40px; height: 40px; border-radius: 50%; font-size: 1em; }
         .btn-tiny-text { font-size: 0.5em; font-weight: bold; line-height: 1; text-align: center; }
         
-        /* Botão Home corrigido para CASINHA */
         .btn-home { font-size: 1.1em; } 
 
-        /* 4. APPS */
         .app-grid {
             display: grid; grid-template-columns: 1fr 1fr; gap: 10px; width: 100%;
         }
@@ -131,7 +118,6 @@
         .netflix { color: #e50914; } .prime { color: #00a8e1; }
         .yt { color: #ff0000; } .apps { color: #555; font-size: 1.2em; }
 
-        /* 5. VOLUME */
         .vol-rocker {
             width: 45px; height: 90px;
             background: #222; border-radius: 20px;
@@ -200,7 +186,6 @@
         function send(comando) {
             console.log("Comando Android: " + comando);
             if (navigator.vibrate) navigator.vibrate(30);
-            // fetch('/api/ir?cmd=' + comando); 
         }
     </script>
 

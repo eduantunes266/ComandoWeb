@@ -1,12 +1,12 @@
 /* --- style.css COMPLETO --- */
 
 :root {
-    --primary: #007bff;     /* Azul Principal */
-    --bg: #121212;          /* Fundo Preto */
-    --card-bg: #1e1e1e;     /* Fundo dos Cartões */
-    --text: #ffffff;        /* Texto Branco */
-    --danger: #dc3545;      /* Vermelho */
-    --success: #28a745;     /* Verde */
+    --primary: #007bff;    
+    --bg: #121212;          
+    --card-bg: #1e1e1e;     
+    --text: #ffffff;      
+    --danger: #dc3545;      
+    --success: #28a745;     
 }
 
 body {
@@ -35,7 +35,6 @@ h2 {
 
 a { text-decoration: none; color: white; }
 
-/* --- CARTÕES (COMUM A TUDO) --- */
 .card {
     background-color: var(--card-bg);
     border-radius: 15px;
@@ -44,14 +43,12 @@ a { text-decoration: none; color: white; }
     box-shadow: 0 4px 6px rgba(0,0,0,0.3);
 }
 
-/* --- ESTILO ESPECÍFICO DO MENU (INDEX) --- */
 .menu-grid {
     display: grid;
     grid-template-columns: 1fr; 
     gap: 20px;
 }
 
-/* Cartões Clicáveis do Menu */
 a.menu-card {
     display: block; 
     transition: transform 0.2s, background-color 0.2s;
@@ -79,7 +76,6 @@ a.menu-card:hover {
     padding-top: 10px;
 }
 
-/* --- ESTILO DOS BOTÕES (TV E MEO) --- */
 .grid-btn {
     display: grid;
     grid-template-columns: repeat(3, 1fr);

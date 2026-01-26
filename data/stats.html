@@ -58,32 +58,25 @@
         </button>
     </div>
 </div>
-
 <script>
     function atualizarStats() {
-        console.log("A pedir dados...");
-        
-        // --- SIMULAÇÃO (Para testares no PC) ---
-        const dados = {
-            uptime_segundos: "2d 4h",
-            sinal_wifi: -45,
-            memoria_livre: "140 KB",
-            ip_local: "192.168.1.50",
-            total_comandos: 128,
-            ultima_acao: "Vol + (TV)"
-        };
-        
-        document.getElementById('uptime').innerText = dados.uptime_segundos;
-        document.getElementById('wifi').innerText = dados.sinal_wifi;
-        document.getElementById('memory').innerText = dados.memoria_livre;
-        document.getElementById('ip').innerText = dados.ip_local;
-        document.getElementById('cmds').innerText = dados.total_comandos;
-        document.getElementById('last').innerText = dados.ultima_acao;
+        fetch('/api/stats')
+            .then(response => response.json())
+            .then(dados => {
+                document.getElementById('uptime').innerText = dados.uptime_segundos;
+                document.getElementById('wifi').innerText = dados.sinal_wifi;
+                document.getElementById('memory').innerText = dados.memoria_livre;
+                document.getElementById('cmds').innerText = dados.total_comandos;
+                document.getElementById('last').innerText = dados.ultima_acao;
+                
+               
+            })
+            .catch(error => console.log("Erro: O ESP32 não responde."));
     }
 
-    // Atualiza mal abres a página
+    setInterval(atualizarStats, 2000);
+    
     atualizarStats();
 </script>
-
 </body>
 </html>

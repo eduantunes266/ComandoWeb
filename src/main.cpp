@@ -1,16 +1,38 @@
+#include <Arduino.h>
 #include <WiFi.h>
 #include <WebServer.h>
 #include <LittleFS.h>
 
-// --- CONFIGURAÇÕES DE WI-FI ---
-const char* ssid = "NOME_DA_TUA_NET";
-const char* password = "PASSWORD_DA_NET";
+const char* ssid = "MEO-99C9A0";
+const char* password = "33d79a7da1";
 
-// Iniciar o servidor na porta 80
+
+
 WebServer server(80);
+int total_comandos = 0;
+String ultima_acao = "Nenhuma";
+unsigned long boot_time = 0;
 
-// --- FUNÇÃO AJUDANTE: Descobre o tipo de ficheiro (MIME Type) ---
-// Isto é importante para o browser saber se está a receber HTML ou CSS
+
+// ALGUMAS FUNCOES PARA TRATAR AS STATS E SERVIR COMO UMA MINI API 
+
+String getUptimeString() {
+  unsigned long agora = millis();
+  unsigned long segundos_totais = (agora - boot_time) / 1000;
+  
+  int horas = segundos_totais / 3600;
+  int restos = segundos_totais % 3600;
+  int minutos = restos / 60;
+  int segundos = restos % 60;
+
+  char buffer[20];
+  sprintf(buffer, "%02dh %02dm %02ds", horas, minutos, segundos);
+  return String(buffer);
+}
+
+
+
+// funcao que funciona homageneamente com o sistema LittleFS para o ESP devolver o conteudo correto para o bom funcionamento da web page
 String getContentType(String filename) {
   if (server.hasArg("download")) return "application/octet-stream";
   else if (filename.endsWith(".htm")) return "text/html";
@@ -18,70 +40,92 @@ String getContentType(String filename) {
   else if (filename.endsWith(".css")) return "text/css";
   else if (filename.endsWith(".js")) return "application/javascript";
   else if (filename.endsWith(".png")) return "image/png";
-  else if (filename.endsWith(".gif")) return "image/gif";
   else if (filename.endsWith(".jpg")) return "image/jpeg";
-  else if (filename.endsWith(".ico")) return "image/x-icon";
   return "text/plain";
 }
 
-// --- O MOTOR INTELIGENTE: Lê ficheiros da memória ---
-bool handleFileRead(String path) {
-  // Se o pedido for a raiz "/", envia o index.html
-  if (path.endsWith("/")) path += "index.html";
 
-  // Verifica se o ficheiro existe na memória LittleFS
+
+// o que responde ao request do cliente (pagina web ) e trata tambem de algumas stats 
+void handleIR() {
+  if (server.hasArg("cmd")) {
+    String comando = server.arg("cmd");
+    total_comandos++;
+    ultima_acao = comando;
+    Serial.println(comando);
+    server.send(200, "text/plain", "OK");
+  } else {
+    server.send(400, "text/plain", "Erro");
+  }
+}
+
+
+
+// junta as stats numa única string e envia a para o servidor 
+void handleStats() {
+  String json = "{";
+  json += "\"uptime_segundos\": \"" + getUptimeString() + "\",";
+  json += "\"sinal_wifi\": \"" + String(WiFi.RSSI()) + " dBm\",";
+  json += "\"memoria_livre\": \"" + String(ESP.getFreeHeap() / 1024) + " KB\",";
+  json += "\"ip_local\": \"" + WiFi.localIP().toString() + "\","; 
+  json += "\"total_comandos\": " + String(total_comandos) + ",";
+  json += "\"ultima_acao\": \"" + ultima_acao + "\"";
+  json += "}";
+
+  server.send(200, "application/json", json);
+}
+
+
+
+// diz para onde o cliente quer ir e devolve o ficheiro correcto do sistema de ficheiros LittleFS
+bool handleFileRead(String path) {
+  if (path.endsWith("/")) path += "index.html";
+  
   if (LittleFS.exists(path)) {
-    // Abre o ficheiro
     File file = LittleFS.open(path, "r");
-    // Envia para o browser com o tipo correto (HTML ou CSS)
-    size_t sent = server.streamFile(file, getContentType(path));
+    server.streamFile(file, getContentType(path));
     file.close();
     return true;
   }
-  return false; // Ficheiro não encontrado
+  return false;
 }
+
+
+
 
 void setup() {
   Serial.begin(115200);
+  boot_time = millis();
 
-  // 1. Iniciar o Sistema de Ficheiros
   if (!LittleFS.begin()) {
-    Serial.println("Erro ao montar LittleFS! A formatar...");
-    LittleFS.format(); // Formata se for a primeira vez
+    LittleFS.format();
     LittleFS.begin();
   }
-  Serial.println("LittleFS iniciado.");
 
-  // 2. Ligar ao Wi-Fi
   WiFi.begin(ssid, password);
-  Serial.print("A ligar");
   while (WiFi.status() != WL_CONNECTED) {
     delay(500);
-    Serial.print(".");
   }
-  Serial.println("\nWi-Fi Ligado!");
-  Serial.print("IP: ");
   Serial.println(WiFi.localIP());
 
-  // 3. Configurar a API (Amanha tratamos disto a fundo)
-  server.on("/api/ir", HTTP_GET, []() {
-    String cmd = server.arg("cmd");
-    Serial.println("Recebido comando API: " + cmd);
-    // Amanhã metemos aqui o código dos infravermelhos!
-    server.send(200, "text/plain", "Comando " + cmd + " recebido");
-  });
-
-  // 4. Configurar o "apanha-tudo" para os ficheiros HTML/CSS
-  // Se não for API, o ESP tenta ler um ficheiro com esse nome
+  // se for recebido um pedido get para uma destas rotas , executamos a funcao correspondente 
+  server.on("/api/ir", HTTP_GET, handleIR);
+  server.on("/api/stats", HTTP_GET, handleStats);
+  
   server.onNotFound([]() {
     if (!handleFileRead(server.uri())) {
-      server.send(404, "text/plain", "404: Ficheiro nao encontrado");
+      server.send(404, "text/plain", "404");
     }
   });
 
   server.begin();
-  Serial.println("Servidor Web Iniciado.");
 }
+
+
+
+
+
+
 
 void loop() {
   server.handleClient();
