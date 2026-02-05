@@ -2,11 +2,20 @@
 #include <WiFi.h>
 #include <WebServer.h>
 #include <LittleFS.h>
+#include <IRremoteESP8266.h>
+#include <IRsend.h>
+#include <IRrecv.h>
+#include <IRutils.h>
 
 const char* ssid = "MEO-99C9A0";
 const char* password = "33d79a7da1";
 
+const uint16_t kRecvPin = 15;
+const uint16_t kIrLed = 4;
 
+IRrecv irrecv(kRecvPin);
+IRsend irsend(kIrLed);
+decode_results results;
 
 WebServer server(80);
 int total_comandos = 0;
@@ -45,13 +54,30 @@ String getContentType(String filename) {
 }
 
 
-
+// RASCUNHO 
 // o que responde ao request do cliente (pagina web ) e trata tambem de algumas stats 
 void handleIR() {
   if (server.hasArg("cmd")) {
     String comando = server.arg("cmd");
     total_comandos++;
     ultima_acao = comando;
+    
+    if (comando == "POWER") {
+        irsend.sendNEC(0x000000, 32); 
+    } 
+    else if (comando == "VOL_UP") {
+        irsend.sendNEC(0x000000, 32); 
+    }
+    else if (comando == "VOL_DOWN") {
+        irsend.sendNEC(0x000000, 32); 
+    }
+    else if (comando == "CH_UP") {
+        irsend.sendNEC(0x000000, 32); 
+    }
+    else if (comando == "CH_DOWN") {
+        irsend.sendNEC(0x000000, 32); 
+    }
+
     Serial.println(comando);
     server.send(200, "text/plain", "OK");
   } else {
@@ -97,6 +123,9 @@ void setup() {
   Serial.begin(115200);
   boot_time = millis();
 
+  irrecv.enableIRIn();
+  irsend.begin();
+
   if (!LittleFS.begin()) {
     LittleFS.format();
     LittleFS.begin();
@@ -129,4 +158,10 @@ void setup() {
 
 void loop() {
   server.handleClient();
+
+  if (irrecv.decode(&results)) {
+    serialPrintUint64(results.value, HEX);
+    Serial.println("");
+    irrecv.resume();
+  }
 }
