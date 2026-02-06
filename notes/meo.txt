@@ -1,0 +1,37 @@
+POWER --> 0xF50AF708
+DEFINIÇOES --> 0x9D62F708
+MICRO --> 0x8B74F708
+YOUTUBE --> 0xC13EF708
+NETFLIX --> 0xB14EF708
+SETAS : 
+        CIMA --> 0xFF00F708
+        BAIXO --> 0xFE01F708
+        DIREITA -->0xFD02F708
+        ESQUERDA -->0xFC03F708
+
+
+BACK --> 0xE31CF708
+MEO --> 0xFA05F708
+HOME --> 0xF30CF708
+VOLUME : 
+        MAIS --> 0xA758F708
+        MENOS --> 0xA25DF708
+PAUSA --> 0xD22DF708
+MUTE --> 0xD12EF708
+CANAIS : 
+        PROXIMO --> 0xA55AF708
+        ANTERIOR --> 0xA05FF708
+NÚMEROS : 
+        0 --> 0xEF10F708
+        1 --> 0xEE11F708
+        2 --> 0xED12F708
+        3 --> 0xEC13F708
+        4 --> 0xEB14F708
+        5 --> 0xEA15F708
+        6 --> 0xE916F708
+        7 --> 0xE817F708
+        8 --> 0xE718F708
+        9 --> 0xE619F708
+
+SETAS --> 0xAF50F708
+GRID --> 0xF708F708

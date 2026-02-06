@@ -2,166 +2,127 @@
 #include <WiFi.h>
 #include <WebServer.h>
 #include <LittleFS.h>
-#include <IRremoteESP8266.h>
-#include <IRsend.h>
-#include <IRrecv.h>
-#include <IRutils.h>
+#include <IRremote.h>
 
 const char* ssid = "MEO-99C9A0";
 const char* password = "33d79a7da1";
+const int PIN_EMISSOR = 14; // O fio de Sinal (S) do emissor vai para o D14
+const int PIN_RECETOR = 13; // O fio de Sinal do recetor vai para o D13
 
-const uint16_t kRecvPin = 15;
-const uint16_t kIrLed = 4;
-
-IRrecv irrecv(kRecvPin);
-IRsend irsend(kIrLed);
-decode_results results;
 
 WebServer server(80);
-int total_comandos = 0;
-String ultima_acao = "Nenhuma";
-unsigned long boot_time = 0;
 
-
-// ALGUMAS FUNCOES PARA TRATAR AS STATS E SERVIR COMO UMA MINI API 
-
-String getUptimeString() {
-  unsigned long agora = millis();
-  unsigned long segundos_totais = (agora - boot_time) / 1000;
+uint32_t obterCodigoMEO(String comando) {
   
-  int horas = segundos_totais / 3600;
-  int restos = segundos_totais % 3600;
-  int minutos = restos / 60;
-  int segundos = restos % 60;
+  if (comando == "POWER")      return 0xF50AF708;
+  if (comando == "SETTINGS")   return 0x9D62F708; 
+  if (comando == "VOICE")      return 0x8B74F708; 
 
-  char buffer[20];
-  sprintf(buffer, "%02dh %02dm %02ds", horas, minutos, segundos);
-  return String(buffer);
+  if (comando == "YOUTUBE")    return 0xC13EF708;
+  if (comando == "NETFLIX")    return 0xB14EF708;
+
+  if (comando == "UP")         return 0xFF00F708;
+  if (comando == "DOWN")       return 0xFE01F708;
+  if (comando == "LEFT")       return 0xFC03F708;
+  if (comando == "RIGHT")      return 0xFD02F708;
+  if (comando == "OK")         return 0xAF50F708;
+
+  if (comando == "BACK")       return 0xE31CF708;
+  if (comando == "HOME")       return 0xF30CF708;
+  if (comando == "TV_MODE")    return 0xFA05F708; 
+
+  if (comando == "VOL_UP")     return 0xA758F708;
+  if (comando == "VOL_DOWN")   return 0xA25DF708;
+  if (comando == "CH_UP")      return 0xA55AF708;
+  if (comando == "CH_DOWN")    return 0xA05FF708;
+  
+  if (comando == "PLAY")       return 0xD22DF708; 
+  if (comando == "MUTE")       return 0xD12EF708;
+
+  if (comando == "0") return 0xEF10F708;
+  if (comando == "1") return 0xEE11F708;
+  if (comando == "2") return 0xED12F708;
+  if (comando == "3") return 0xEC13F708;
+  if (comando == "4") return 0xEB14F708;
+  if (comando == "5") return 0xEA15F708;
+  if (comando == "6") return 0xE916F708;
+  if (comando == "7") return 0xE817F708;
+  if (comando == "8") return 0xE718F708;
+  if (comando == "9") return 0xE619F708;
+
+  if (comando == "APPS_GRID")  return 0xF708F708; 
+  if (comando == "SWAP")       return 0xAF50F708;          
+
+  return 0; 
 }
 
-
-
-// funcao que funciona homageneamente com o sistema LittleFS para o ESP devolver o conteudo correto para o bom funcionamento da web page
-String getContentType(String filename) {
-  if (server.hasArg("download")) return "application/octet-stream";
-  else if (filename.endsWith(".htm")) return "text/html";
-  else if (filename.endsWith(".html")) return "text/html";
-  else if (filename.endsWith(".css")) return "text/css";
-  else if (filename.endsWith(".js")) return "application/javascript";
-  else if (filename.endsWith(".png")) return "image/png";
-  else if (filename.endsWith(".jpg")) return "image/jpeg";
-  return "text/plain";
-}
-
-
-// RASCUNHO 
-// o que responde ao request do cliente (pagina web ) e trata tambem de algumas stats 
 void handleIR() {
   if (server.hasArg("cmd")) {
-    String comando = server.arg("cmd");
-    total_comandos++;
-    ultima_acao = comando;
-    
-    if (comando == "POWER") {
-        irsend.sendNEC(0x000000, 32); 
-    } 
-    else if (comando == "VOL_UP") {
-        irsend.sendNEC(0x000000, 32); 
-    }
-    else if (comando == "VOL_DOWN") {
-        irsend.sendNEC(0x000000, 32); 
-    }
-    else if (comando == "CH_UP") {
-        irsend.sendNEC(0x000000, 32); 
-    }
-    else if (comando == "CH_DOWN") {
-        irsend.sendNEC(0x000000, 32); 
-    }
+    String comandoNome = server.arg("cmd");
+    Serial.print("Recebi do site: ");
+    Serial.println(comandoNome);
 
-    Serial.println(comando);
-    server.send(200, "text/plain", "OK");
+    uint32_t codigoHex = obterCodigoMEO(comandoNome);
+
+    if (codigoHex != 0) {
+      IrSender.sendNEC(codigoHex, 32);
+      Serial.print(" -> Disparado HEX: 0x");
+      Serial.println(codigoHex, HEX);
+      server.send(200, "text/plain", "OK");
+    } else {
+      Serial.println(" -> ERRO: Botão sem código definido!");
+      server.send(400, "text/plain", "Botao nao configurado");
+    }
   } else {
-    server.send(400, "text/plain", "Erro");
+    server.send(400, "text/plain", "Erro nos parametros");
   }
 }
 
-
-
-// junta as stats numa única string e envia a para o servidor 
-void handleStats() {
-  String json = "{";
-  json += "\"uptime_segundos\": \"" + getUptimeString() + "\",";
-  json += "\"sinal_wifi\": \"" + String(WiFi.RSSI()) + " dBm\",";
-  json += "\"memoria_livre\": \"" + String(ESP.getFreeHeap() / 1024) + " KB\",";
-  json += "\"ip_local\": \"" + WiFi.localIP().toString() + "\","; 
-  json += "\"total_comandos\": " + String(total_comandos) + ",";
-  json += "\"ultima_acao\": \"" + ultima_acao + "\"";
-  json += "}";
-
-  server.send(200, "application/json", json);
-}
-
-
-
-// diz para onde o cliente quer ir e devolve o ficheiro correcto do sistema de ficheiros LittleFS
-bool handleFileRead(String path) {
+void handleFileRead() {
+  String path = server.uri();
   if (path.endsWith("/")) path += "index.html";
   
+  String contentType = "text/plain";
+  if (path.endsWith(".html")) contentType = "text/html";
+  else if (path.endsWith(".css")) contentType = "text/css";
+  else if (path.endsWith(".js")) contentType = "application/javascript";
+
   if (LittleFS.exists(path)) {
     File file = LittleFS.open(path, "r");
-    server.streamFile(file, getContentType(path));
+    server.streamFile(file, contentType);
     file.close();
-    return true;
+  } else {
+    server.send(404, "text/plain", "404: Ficheiro Nao Encontrado");
   }
-  return false;
 }
 
-
-
-
 void setup() {
+  
   Serial.begin(115200);
-  boot_time = millis();
+  
+  IrSender.begin(PIN_EMISSOR);
+  
+  IrReceiver.begin(PIN_RECETOR, ENABLE_LED_FEEDBACK);
+  IrSender.begin(PIN_EMISSOR);
 
-  irrecv.enableIRIn();
-  irsend.begin();
-
-  if (!LittleFS.begin()) {
-    LittleFS.format();
-    LittleFS.begin();
+  if(!LittleFS.begin()){
+    Serial.println("Erro LittleFS");
+    return;
   }
 
   WiFi.begin(ssid, password);
   while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
+    delay(500); Serial.print(".");
   }
+  Serial.println("\n--- SISTEMA ONLINE ---");
   Serial.println(WiFi.localIP());
 
-  // se for recebido um pedido get para uma destas rotas , executamos a funcao correspondente 
-  server.on("/api/ir", HTTP_GET, handleIR);
-  server.on("/api/stats", HTTP_GET, handleStats);
-  
-  server.onNotFound([]() {
-    if (!handleFileRead(server.uri())) {
-      server.send(404, "text/plain", "404");
-    }
-  });
+  server.on("/api/ir", handleIR);
+  server.onNotFound(handleFileRead);
 
   server.begin();
 }
 
-
-
-
-
-
-
 void loop() {
   server.handleClient();
-
-  if (irrecv.decode(&results)) {
-    serialPrintUint64(results.value, HEX);
-    Serial.println("");
-    irrecv.resume();
-  }
 }
