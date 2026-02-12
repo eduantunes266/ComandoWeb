@@ -2,8 +2,7 @@
 <html lang="pt">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Comando MEO Digital v2</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">    <title>Comando MEO Digital v2</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <style>
         body {
@@ -144,8 +143,17 @@
         }
         
         .row-bottom .btn-mid { font-size: 1em; }
-
-    </style>
+body {
+  min-height: 100vh; 
+  height: auto; 
+  
+  overflow-y: auto; 
+  
+  margin: 0;
+  padding: 20px 0;
+  touch-action: manipulation;
+}
+ </style>
 </head>
 <body>
 <a href="index.html" class="back-link" style="position: absolute; top: 20px; left: 20px; color: #555; font-size: 1.5em;"><i class="fas fa-arrow-left"></i></a>

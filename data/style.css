@@ -104,3 +104,14 @@ a.menu-card:hover {
 
 .btn i { margin-bottom: 5px; font-size: 1.2em; pointer-events: none; }
 .btn span { font-size: 0.7em; margin-top: 2px; text-transform: uppercase; opacity: 0.8; }
+
+body {
+  min-height: 100vh; 
+  height: auto; 
+  
+  overflow-y: auto; 
+  
+  margin: 0;
+  padding: 20px 0;
+  touch-action: manipulation;
+}
